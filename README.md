@@ -71,9 +71,11 @@ For the creation/inactivation Lambda function:
 Sample Output: The response.json will contain logs such as:
 
 ```json
+{
 "For user - username, Access & Secret keys will be inactivated."
 "key has been inactivated."
 "A new set of keys has been created for user - username."
+}
 
 CloudWatch Logs: You can also check the logs of your Lambda functions in CloudWatch for detailed output.
 
