@@ -40,30 +40,33 @@ This project contains two Lambda functions to automate the key rotation process 
 Replace IAM_User_Name with the actual IAM username.
 Replace AccessKeyId and SecretAccessKey with the current key pair for that IAM user.
 Save the secret and note the Secret ARN.
-Step 3: Set Up Lambda Environment Variables
+
+### Step 3: Set Up Lambda Environment Variables
 For each Lambda function, you need to set up environment variables:
 
 Go to the Configuration section of each Lambda function.
 Add a new environment variable:
-Key: secrets
-Value: A semicolon-separated list of Secret ARNs (e.g., arn:aws:secretsmanager:us-east-1:123456789012:secret:MySecret1;arn:aws:secretsmanager:us-east-1:123456789012:secret:MySecret2).
-Step 4: Set Up IAM Roles for Lambda Functions
+- Key: secrets
+- Value: A semicolon-separated list of Secret ARNs (e.g., arn:aws:secretsmanager:us-east-1:123456789012:secret:MySecret1;arn:aws:secretsmanager:us-east-1:123456789012:secret:MySecret2).
+
+### Step 4: Set Up IAM Roles for Lambda Functions
 The Lambda functions require permissions to access IAM and Secrets Manager. Ensure the following permissions are attached to the Lambda execution role:
 
-secretsmanager:GetSecretValue
-secretsmanager:UpdateSecret
-iam:ListAccessKeys
-iam:UpdateAccessKey
-iam:CreateAccessKey
-iam:DeleteAccessKey
-Step 5: Testing and Invocation
+- secretsmanager:GetSecretValue
+- secretsmanager:UpdateSecret
+- iam:ListAccessKeys
+- iam:UpdateAccessKey
+- iam:CreateAccessKey
+- iam:DeleteAccessKey
+
+### Step 5: Testing and Invocation
 You can invoke the Lambda functions directly using the AWS Management Console or AWS CLI.
 
-Using AWS CLI:
+## Using AWS CLI:
 
 For the creation/inactivation Lambda function:
 
-aws lambda invoke --function-name <Your_Lambda_Function_Name_Create> response.json
+`aws lambda invoke --function-name <Your_Lambda_Function_Name_Create> response.json`
 
 Sample Output: The response.json will contain logs such as:
 
@@ -73,18 +76,19 @@ Sample Output: The response.json will contain logs such as:
 
 CloudWatch Logs: You can also check the logs of your Lambda functions in CloudWatch for detailed output.
 
-Step 6: Verify Key Rotation
+### Step 6: Verify Key Rotation
 Check in Secrets Manager: After invoking the create Lambda, check in AWS Secrets Manager to see if the secret has been updated with new key details.
 
 Check in IAM: Go to the IAM Console and ensure the old keys are inactivated, new keys are created, and inactive keys are deleted.
 
-Clean Up
+## Clean Up
 Once the project is complete or no longer needed, make sure to clean up the resources by:
 
-Deleting the Lambda functions.
-Deleting the secrets in AWS Secrets Manager.
-Removing any related IAM policies and roles.
-Conclusion
+1. **Deleting the Lambda functions.
+2. **Deleting the secrets in AWS Secrets Manager.
+3. **Removing any related IAM policies and roles.
+   
+## Conclusion
 This project provides a demonstration for automating IAM key rotation using Lambda functions and AWS Secrets Manager. You can extend it by scheduling these Lambda functions using Amazon CloudWatch Events to periodically rotate IAM keys for your users.
 
 ### Notes for Students
