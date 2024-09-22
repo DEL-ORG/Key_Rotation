@@ -89,6 +89,97 @@ Once the project is complete or no longer needed, make sure to clean up the reso
 1. **Deleting the Lambda functions.
 2. **Deleting the secrets in AWS Secrets Manager.
 3. **Removing any related IAM policies and roles.
+
+## Step 7: Setup Automatic trigger; when lambda one runs to completion to trigger lambda two
+
+1. AWS Step Functions (Recommended)
+AWS Step Functions allow you to orchestrate multiple Lambda functions and other AWS services in a sequence. You can configure it so that after Lambda One completes successfully, Lambda Two is automatically triggered.
+
+### Steps to Use Step Functions:
+1. **Create a State Machine in AWS Step Functions.
+2. **Define the workflow as follows:
+   -  First, invoke Lambda One.
+   -  On successful completion of Lambda One, invoke Lambda Two.
+3. **If Lambda One fails, you can handle the error by either retrying or notifying you.
+Example of a Step Function Definition:
+
+   ```json
+   {
+   "StartAt": "RunLambdaOne",
+   "States": {
+      "RunLambdaOne": {
+         "Type": "Task",
+         "Resource": "arn:aws:lambda:region:account-id:function:lambda-one-name",
+         "Next": "RunLambdaTwo",
+         "Catch": [
+         {
+            "ErrorEquals": ["States.ALL"],
+            "Next": "FailState"
+         }
+         ]
+      },
+      "RunLambdaTwo": {
+         "Type": "Task",
+         "Resource": "arn:aws:lambda:region:account-id:function:lambda-two-name",
+         "End": true
+      },
+      "FailState": {
+         "Type": "Fail",
+         "Cause": "Lambda One failed"
+      }
+   }
+   }
+
+This will ensure that Lambda Two runs only after Lambda One completes successfully.
+
+2. Amazon EventBridge
+EventBridge can be used to create a rule that triggers Lambda Two based on the completion of Lambda One.
+
+Steps to Use EventBridge:
+1. **Add a Success Event: You can configure Lambda One to send an event to EventBridge upon successful execution.
+2. **Create an EventBridge Rule: Create a rule that listens for this event and triggers Lambda Two when the event occurs.
+   
+####  Example Lambda One Modification to Trigger Event:
+####  Modify Lambda One to publish an event to EventBridge after it successfully completes:
+
+   ```python
+   import json
+   import boto3
+   import os
+
+   iam = boto3.client('iam')
+   secretsmanager = boto3.client('secretsmanager')
+   eventbridge = boto3.client('events')
+
+   def lambda_handler(event, context):
+      
+      # Your existing key rotation logic here...
+      
+      # If Lambda One completes successfully, publish an event to EventBridge
+      response = eventbridge.put_events(
+         Entries=[
+               {
+                  'Source': 'my.custom.lambda.one',
+                  'DetailType': 'LambdaOneCompleted',
+                  'Detail': json.dumps({'status': 'success'}),
+                  'EventBusName': 'default'
+               }
+         ]
+      )
+      print("Event triggered after Lambda One completion.")
+      
+      return "Process key creation & secret update has completed successfully."
+
+###   Set Up EventBridge Rule:
+1. **Create a new EventBridge rule that listens for this custom event:
+   -  Event Source: my.custom.lambda.one
+   -  Detail Type: LambdaOneCompleted
+2. **Set Lambda Two as the target for this rule.
+This way, when Lambda One finishes, it will send an event to EventBridge, which in turn triggers Lambda Two.
+
+## Note:
+   -  Step Functions: The best approach if you want more control over the orchestration, retries, and monitoring of the workflow.
+   -  EventBridge: A simpler solution that works well if you just want to trigger Lambda Two based on a successful event from Lambda One.
    
 ## Conclusion
 This project provides a demonstration for automating IAM key rotation using Lambda functions and AWS Secrets Manager. You can extend it by scheduling these Lambda functions using Amazon CloudWatch Events to periodically rotate IAM keys for your users.
