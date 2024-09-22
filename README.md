@@ -142,7 +142,7 @@ Steps to Use EventBridge:
 ####  Example Lambda One Modification to Trigger Event:
 ####  Modify Lambda One to publish an event to EventBridge after it successfully completes:
 
-   ```python
+   ``python
    import json
    import boto3
    import os
