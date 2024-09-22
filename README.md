@@ -177,12 +177,13 @@ Steps to Use EventBridge:
 2. **Set Lambda Two as the target for this rule.
 This way, when Lambda One finishes, it will send an event to EventBridge, which in turn triggers Lambda Two.
 
-## Note:
+### Note:
    -  Step Functions: The best approach if you want more control over the orchestration, retries, and monitoring of the workflow.
    -  EventBridge: A simpler solution that works well if you just want to trigger Lambda Two based on a successful event from Lambda One.
    
 ## Conclusion
 This project provides a demonstration for automating IAM key rotation using Lambda functions and AWS Secrets Manager. You can extend it by scheduling these Lambda functions using Amazon CloudWatch Events to periodically rotate IAM keys for your users.
+
 
 ### Notes for Students
 
