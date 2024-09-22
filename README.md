@@ -142,33 +142,33 @@ Steps to Use EventBridge:
 ####  Example Lambda One Modification to Trigger Event:
 ####  Modify Lambda One to publish an event to EventBridge after it successfully completes:
 
-   ``python
-   import json
-   import boto3
-   import os
+import json
+import boto3
+import os
 
-   iam = boto3.client('iam')
-   secretsmanager = boto3.client('secretsmanager')
-   eventbridge = boto3.client('events')
+iam = boto3.client('iam')
+secretsmanager = boto3.client('secretsmanager')
+eventbridge = boto3.client('events')
 
-   def lambda_handler(event, context):
-      
-      # Your existing key rotation logic here...
-      
-      # If Lambda One completes successfully, publish an event to EventBridge
-      response = eventbridge.put_events(
-         Entries=[
-               {
-                  'Source': 'my.custom.lambda.one',
-                  'DetailType': 'LambdaOneCompleted',
-                  'Detail': json.dumps({'status': 'success'}),
-                  'EventBusName': 'default'
-               }
-         ]
-      )
-      print("Event triggered after Lambda One completion.")
-      
-      return "Process key creation & secret update has completed successfully."
+def lambda_handler(event, context):
+    
+    # Your existing key rotation logic here...
+    
+    # If Lambda One completes successfully, publish an event to EventBridge
+    response = eventbridge.put_events(
+        Entries=[
+            {
+                'Source': 'my.custom.lambda.one',
+                'DetailType': 'LambdaOneCompleted',
+                'Detail': json.dumps({'status': 'success'}),
+                'EventBusName': 'default'
+            }
+        ]
+    )
+    print("Event triggered after Lambda One completion.")
+    
+    return "Process key creation & secret update has completed successfully."
+
 
 ###   Set Up EventBridge Rule:
 1. **Create a new EventBridge rule that listens for this custom event:
